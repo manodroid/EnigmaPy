@@ -23,13 +23,12 @@ class Rotor:
                 self.right = self.right[25] + self.right[:25]
 
     def setRing(self, ring):
-        'rotate the rotor backward and adjust turnover notch to ring'
-        self.rotate(ring-1, forward=False)
+        """rotate the rotor backward and adjust turnover notch to ring"""
+        self.rotate(ring - 1, forward=False)
         notch = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.find(self.notch)
-        self.notch = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[(notch-ring) % 26]
-
+        self.notch = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[(notch - ring) % 26]
 
     def rotateToLetter(self, letter):
-        'rotate rotor to a specific letter'
+        """rotate rotor to a specific letter"""
         l = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.find(letter)
         self.rotate(l)

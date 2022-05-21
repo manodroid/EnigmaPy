@@ -8,11 +8,19 @@ class Enigma:
 
     def inward(self, letter):
         """the return from keyboard through all rotors"""
-        return -1
+        signal = self.kb.forward(letter)
+        signal = self.pb.forward(signal)
+        for r in self.rotors[::-1]:
+            signal = r.forward(signal)
+        return signal
 
     def backward(self, letter):
         """the return from the reflector and all rotors"""
-        return -1
+        signal = letter
+        for r in self.rotors:
+            signal = r.backward(signal)
+        signal = self.pb.backward(signal)
+        return self.kb.backward(signal)
 
     def set_rings(self, rings):
         for rotor, ring in zip(self.rotors, rings):
@@ -22,8 +30,7 @@ class Enigma:
         for rotor, key in zip(self.rotors, keys):
             rotor.rotateToLetter(key)
 
-    # try to remove keyboard plug board and maybe reflector
-    def encipher(self, text):
+    def encipher(self, text: object) -> object:
         res = ''
         for letter in text:
             if letter == " ":
@@ -35,16 +42,7 @@ class Enigma:
             elif self.rotors[1].left[0] == self.rotors[1].notch:  # third rotor shifts every 26^2 letters
                 self.rotors[0].rotate()
 
-        # remove this to their own functions
-            signal = self.kb.forward(letter)
-            signal = self.pb.forward(signal)
-            signal = self.rotors[2].forward(signal)
-            signal = self.rotors[1].forward(signal)
-            signal = self.rotors[0].forward(signal)
-            signal = self.re.reflect(signal)
-            signal = self.rotors[0].backward(signal)
-            signal = self.rotors[1].backward(signal)
-            signal = self.rotors[2].backward(signal)
-            signal = self.pb.backward(signal)
-            res += self.kb.backward(signal)
+            signal = self.inward(letter)  # input from rotors
+            signal = self.re.reflect(signal)  # reflector output
+            res += self.backward(signal)  # output from reflectors
         return res
