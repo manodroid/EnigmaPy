@@ -6,22 +6,6 @@ class Enigma:
         self.pb = pb
         self.kb = kb
 
-    def inward(self, letter):
-        """the return from keyboard through all rotors"""
-        signal = self.kb.forward(letter)
-        signal = self.pb.forward(signal)
-        for r in self.rotors[::-1]:
-            signal = r.forward(signal)
-        return signal
-
-    def backward(self, letter):
-        """the return from the reflector and all rotors"""
-        signal = letter
-        for r in self.rotors:
-            signal = r.backward(signal)
-        signal = self.pb.backward(signal)
-        return self.kb.backward(signal)
-
     def set_rings(self, rings):
         for rotor, ring in zip(self.rotors, rings):
             rotor.setRing(ring)
@@ -30,19 +14,52 @@ class Enigma:
         for rotor, key in zip(self.rotors, keys):
             rotor.rotateToLetter(key)
 
-    def encipher(self, text: object) -> object:
-        res = ''
-        for letter in text:
-            if letter == " ":
-                res += ' '
-                continue
-            self.rotors[2].rotate()
-            if self.rotors[2].left[0] == self.rotors[2].notch:  # second rotor shifts every 26 letters
-                self.rotors[1].rotate()
-            elif self.rotors[1].left[0] == self.rotors[1].notch:  # third rotor shifts every 26^2 letters
-                self.rotors[0].rotate()
+    def encipher(self, letter):
+        r1, r2, r3 = self.rotors
+        if r2.left[0] == r2.notch and r3.left[0] == r3.notch:
+            r1.rotate()
+            r2.rotate()
+            r3.rotate()
+        elif r2.left[0] == r2.notch:
+            r1.rotate()
+            r2.rotate()
+            r3.rotate()
+        elif r3.left[0] == r3.notch:
+            r2.rotate()
+            r3.rotate()
+        else:
+            r3.rotate()
 
-            signal = self.inward(letter)  # input from rotors
-            signal = self.re.reflect(signal)  # reflector output
-            res += self.backward(signal)  # output from reflectors
-        return res
+        # add option to skip backspace and space
+        signal = self.kb.forward(letter)
+        path = [signal, signal]
+        signal = self.pb.forward(signal)
+        path.append(signal)
+        path.append(signal)
+        signal = r3.forward(signal)
+        path.append(signal)
+        path.append(signal)
+        signal = r2.forward(signal)
+        path.append(signal)
+        path.append(signal)
+        signal = r1.forward(signal)
+        path.append(signal)
+        path.append(signal)
+        signal = self.re.reflect(signal)
+        path.append(signal)
+        path.append(signal)
+        path.append(signal)
+        signal = r1.backward(signal)
+        path.append(signal)
+        path.append(signal)
+        signal = r2.backward(signal)
+        path.append(signal)
+        path.append(signal)
+        signal = r3.backward(signal)
+        path.append(signal)
+        path.append(signal)
+        signal = self.pb.backward(signal)
+        path.append(signal)
+        path.append(signal)
+        letter = self.kb.backward(signal)
+        return path, letter
