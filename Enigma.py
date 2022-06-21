@@ -30,36 +30,21 @@ class Enigma:
         else:
             r3.rotate()
 
-        # add option to skip backspace and space
         signal = self.kb.forward(letter)
         path = [signal, signal]
         signal = self.pb.forward(signal)
-        path.append(signal)
-        path.append(signal)
-        signal = r3.forward(signal)
-        path.append(signal)
-        path.append(signal)
-        signal = r2.forward(signal)
-        path.append(signal)
-        path.append(signal)
-        signal = r1.forward(signal)
-        path.append(signal)
-        path.append(signal)
-        signal = self.re.reflect(signal)
-        path.append(signal)
-        path.append(signal)
-        path.append(signal)
-        signal = r1.backward(signal)
-        path.append(signal)
-        path.append(signal)
-        signal = r2.backward(signal)
-        path.append(signal)
-        path.append(signal)
-        signal = r3.backward(signal)
-        path.append(signal)
-        path.append(signal)
+        path.extend([signal, signal])
+        # from keyboard through rotors 
+        for r in self.rotors:
+            signal = r.forward(signal)
+            path.extend([signal, signal])
+        signal = self.re.reflect(signal) # reflection
+        path.extend([signal, signal, signal])
+        # from rotors to the lampboard
+        for r in self.rotors[::-1]:
+            signal = r.backward(signal)
+            path.extend([signal, signal])
         signal = self.pb.backward(signal)
-        path.append(signal)
-        path.append(signal)
+        path.extend([signal, signal])
         letter = self.kb.backward(signal)
         return path, letter

@@ -8,9 +8,6 @@ from draw import draw
 import pygame
 from pygame.locals import *
 
-# make components tighter and the letters smaller
-# make z work to, put a name under each component
-# add the live user input tracking
 # Gui setup
 pygame.init()
 pygame.font.init()
@@ -50,7 +47,7 @@ Enig.set_rings([1, 1, 1])
 animating = True
 while animating:
 
-    SCREEN.fill("#333337")  # background
+    SCREEN.fill("#333337")  # backgroung
 
     #text input
     text = BOLD.render(INPUT, True, "white")
@@ -83,6 +80,3 @@ while animating:
                     # update path error
                     PATH, cipher = Enig.encipher(key.upper())
                     OUTPUT += cipher
-
-
-    # check encryption and also shorten the path 
