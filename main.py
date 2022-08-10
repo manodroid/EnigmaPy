@@ -15,8 +15,8 @@ pygame.display.set_caption("Enigma Simulator")
 # fonts
 ALPA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ '
 print()
-MONO = pygame.font.SysFont("De", 24)
-BOLD = pygame.font.SysFont("FreeMono", 25, bold=True)
+MONO = pygame.font.SysFont("De", 28)
+BOLD = pygame.font.SysFont("FreeMono", 24, bold=True)
 # global variables
 WIDTH, HEIGHT = 1600, 900
 MARGINS = {"top":200, "bottom":100, "left":100, "right":100}
@@ -65,9 +65,12 @@ while animating:
 
     # track user input
     for event in pygame.event.get():
+
         if event.type == pygame.QUIT:
             animating = False
         elif event.type == pygame.KEYDOWN:
+            if len(OUTPUT) > 80:
+                OUTPUT, INPUT = '', ''
             if event.key == pygame.K_DOWN:
                 III.rotate()
             elif event.key == pygame.K_SPACE:
